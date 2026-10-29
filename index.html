@@ -8,12 +8,21 @@
 <nav id="nav"><button class="active" data-tab="home">Home</button><button data-tab="tree">Family Tree</button><button data-tab="albums">Albums</button><button data-tab="community">Community</button><button data-tab="directory">Directory</button><button data-tab="events">Events</button></nav>
 <main>
 <section id="home"><div class="hero" role="img" aria-label="LEGACIES golden family tree and Our Roots, Our Stories, Our Future"></div><div class="feature-grid"><button class="feature" onclick="openTab('albums')"><img src="family-albums (2).webp" alt="Vintage family photographs"><span>Photo Albums ↗</span></button><button class="feature" onclick="openTab('community')"><img src="family-stories (1).webp" alt="Antique family memory book"><span>Family Stories ↗</span></button><button class="feature" onclick="openTab('tree')"><img src="family-history (2).webp" alt="Antique compass over map"><span>Family History ↗</span></button><button class="feature" onclick="openTab('community')"><img src="family-discussions (1).webp" alt="Warm family porch"><span>Family Discussions ↗</span></button></div><div class="dashboard-grid"><div class="panel"><h2>✦ Featured Family Members</h2><div class="grid"><button onclick="selectPerson(4);openTab('tree')" class="person"><span class="avatar">T</span><strong>Taylor Rivera</strong><small>View family branch →</small></button><button onclick="selectPerson(5);openTab('tree')" class="person"><span class="avatar">M</span><strong>Morgan Rivera</strong><small>View family branch →</small></button></div></div><div class="panel"><h2>✦ Recent Community Activity</h2><p><strong>Family Reunion Planning</strong></p><p class="muted">Share ideas for our next gathering.</p><button onclick="openTab('community')">Open community →</button></div><div class="panel"><h2>✦ Upcoming Events</h2><p><strong>Family Reunion</strong></p><p class="muted">Sample event · Date to be announced</p><button onclick="openTab('events')">View events →</button></div></div></section>
-<section id="tree" hidden><div class="panel"><h2>Our Family Tree</h2><p class="muted">Select a relative to center their branch. All names here are fictional sample data.</p><label for="family-search">Find a family member</label><input id="family-search" placeholder="Search names..." oninput="showPeople()"><div id="people" class="grid"></div></div><div id="details" class="panel"></div></section>
+<section id="tree" hidden><div class="panel"><h2>Our Family Tree</h2><p class="muted">Select a relative to center their branch. All names here are fictional sample data.</p><label for="family-search">Find a family member</label><input id="family-search" placeholder="Search names..." oninput="showPeople()"><div id="people" class="grid"></div></div>
+<div class="panel"><h2>Add a Relative · Demo</h2><p class="muted">Use fictional names only. Entries last until this page is reloaded.</p>
+<form id="relative-form"><label for="relative-name">Name</label><input id="relative-name" required maxlength="70" placeholder="Sample relative name">
+<label for="relative-parent">Parent or family connection</label><select id="relative-parent"><option value="">No parent recorded</option></select>
+<label for="relative-note">A memory or note</label><textarea id="relative-note" maxlength="400" placeholder="A short family memory"></textarea><button type="submit">Add relative to demo tree</button></form><p id="relative-status" class="muted" role="status"></p></div>
+<div id="details" class="panel"></div>
+<div class="panel"><h2>Suggested Corrections · Demo</h2><p class="muted">Suggestions do not overwrite the original contributor's information. Family members can agree or disagree; the original contributor decides whether to update their submission.</p>
+<form id="correction-form"><label for="correction-person">Person</label><select id="correction-person"></select>
+<label for="correction-text">Suggested correction</label><textarea id="correction-text" required maxlength="400" placeholder="What should be corrected?"></textarea>
+<button type="submit">Submit correction suggestion</button></form><div id="corrections"></div></div></section>
 <section id="albums" hidden><div class="panel"><h2>Family Albums</h2><p>Faces not identified by the uploader will be blurred in the finished site.</p><div class="grid"><div><div class="photo">📷</div><h3>Family picnic</h3><p class="muted">All people identified · sample</p></div><div><div class="photo"><span class="blur">👤</span></div><h3>Who is this?</h3><p class="muted">Unidentified face blurred · sample</p><button onclick="alert('In the full version, relatives can suggest an identification for the uploader to accept.')">Suggest identification</button></div></div></div></section>
 <section id="community" hidden><div class="panel"><h2>Community Board</h2><p class="muted">A space for announcements, memories and family questions.</p><div id="posts"><div class="panel"><strong>Welcome to LEGACIES!</strong><p>Share stories and keep in touch. This is an example post.</p></div></div><label for="post">Try a sample post</label><textarea id="post" rows="3" placeholder="Share a family memory..."></textarea><button onclick="addPost()">Add to demo board</button><p class="muted">Demo posts are only visible in this browser session.</p></div></section>
 <section id="directory" hidden><div class="panel"><h2>Family Directory</h2><p>Members will choose which contact details other relatives may see.</p><div class="grid"><div class="person"><strong>Jordan Rivera</strong><small>Contact preferences: email only</small></div><div class="person"><strong>Alex Morgan</strong><small>Contact preferences: private</small></div></div><p class="muted">Fictional entries; no real contact information.</p></div></section>
 <section id="events" hidden><div class="panel"><h2>Family Events</h2><div class="person"><strong>Family Reunion</strong><p>Example event · Date to be announced</p><button onclick="alert('RSVP tracking will be available after family accounts are enabled.')">RSVP preview</button></div></div></section>
-</main><footer>LEGACIES · Prototype v0.2 · Not ready for real family data</footer>
+</main><footer>LEGACIES · Prototype v0.3 · Not ready for real family data</footer>
 <script>
 const people=[
 {id:1,name:'Evelyn Rivera',parents:[],partner:2,note:'Grandmother who preserves family recipes.'},
@@ -50,4 +59,49 @@ function openTab(tab){document.querySelectorAll('main section').forEach(s=>s.hid
 document.querySelectorAll('nav button').forEach(b=>b.addEventListener('click',()=>openTab(b.dataset.tab)));
 function addPost(){const field=document.getElementById('post'),v=field.value.trim();if(!v)return;const div=document.createElement('div');div.className='panel';const strong=document.createElement('strong');strong.textContent='Demo family member';const p=document.createElement('p');p.textContent=v;div.append(strong,p);document.getElementById('posts').prepend(div);field.value=''}
 showPeople();
+
+const corrections=[];
+function refreshPeopleSelects(){
+ for(const id of ['relative-parent','correction-person']){
+ const el=document.getElementById(id);if(!el)continue;const selected=el.value;el.replaceChildren();
+ if(id==='relative-parent'){const blank=document.createElement('option');blank.value='';blank.textContent='No parent recorded';el.append(blank)}
+ for(const p of people){const opt=document.createElement('option');opt.value=p.id;opt.textContent=p.name;el.append(opt)}
+ if([...el.options].some(o=>o.value===selected))el.value=selected;
+ }
+}
+document.getElementById('relative-form').addEventListener('submit',e=>{
+ e.preventDefault();const name=document.getElementById('relative-name').value.trim();
+ if(!name)return;const parent=document.getElementById('relative-parent').value;
+ const note=document.getElementById('relative-note').value.trim();
+ const id=Math.max(...people.map(p=>p.id))+1;
+ people.push({id,name,parents:parent?[Number(parent)]:[],partner:null,note:note||'No memory added yet.'});
+ document.getElementById('relative-form').reset();refreshPeopleSelects();showPeople();
+ document.getElementById('relative-status').textContent=name+' added to this demo session only. This is not saved.';
+});
+document.getElementById('correction-form').addEventListener('submit',e=>{
+ e.preventDefault();const person=Number(document.getElementById('correction-person').value);
+ const suggestion=document.getElementById('correction-text').value.trim();if(!suggestion)return;
+ corrections.unshift({person,suggestion,agree:0,disagree:0,myVote:0});
+ document.getElementById('correction-form').reset();renderCorrections();
+});
+function voteCorrection(i,v){
+ const c=corrections[i];if(!c)return;
+ if(c.myVote===1)c.agree--;if(c.myVote===-1)c.disagree--;
+ if(c.myVote===v)c.myVote=0;else{c.myVote=v;if(v===1)c.agree++;else c.disagree++}
+ renderCorrections();
+}
+function renderCorrections(){
+ const el=document.getElementById('corrections');el.replaceChildren();
+ if(!corrections.length){const p=document.createElement('p');p.className='muted';p.textContent='No correction suggestions in this session.';el.append(p);return}
+ corrections.forEach((c,i)=>{
+ const wrap=document.createElement('div');wrap.className='relationship-group';
+ const h=document.createElement('h3');h.textContent=byId(c.person)?.name||'Unknown relative';
+ const p=document.createElement('p');p.textContent=c.suggestion;
+ const yes=document.createElement('button');yes.textContent='Agree ('+c.agree+')';yes.setAttribute('aria-pressed',String(c.myVote===1));yes.onclick=()=>voteCorrection(i,1);
+ const no=document.createElement('button');no.textContent='Disagree ('+c.disagree+')';no.setAttribute('aria-pressed',String(c.myVote===-1));no.onclick=()=>voteCorrection(i,-1);
+ const note=document.createElement('p');note.className='muted';note.textContent='Pending contributor review · Demo votes only';
+ wrap.append(h,p,yes,document.createTextNode(' '),no,note);el.append(wrap);
+ });
+}
+refreshPeopleSelects();renderCorrections();
 </script></body></html>
